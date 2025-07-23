@@ -277,14 +277,14 @@ def create_demo_interface():
         
         gr.Examples(
             examples=examples,
-            inputs=[text_symptoms, medical_image, audio_file, patient_age, patient_gender],
+            inputs=[text_symptoms, medical_image, audio_file, patient_name, patient_age, patient_gender],
             label="Click on an example to try it out"
         )
         
         # Connect the interface
         submit_btn.click(
             fn=multimodal_predict,
-            inputs=[text_symptoms, medical_image, audio_file, patient_age, patient_gender],
+            inputs=[text_symptoms, medical_image, audio_file, patient_name, patient_age, patient_gender],
             outputs=[analysis_output, recommendations_output, confidence_output],
             show_progress=True
         )
