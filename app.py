@@ -132,12 +132,13 @@ def create_demo_interface():
         margin-bottom: 20px;
     }
     .warning {
-        background-color: #fff3cd;
-        border: 1px solid #ffeaa7;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
-        color: #856404;
+        color: #721c24;
+        font-weight: 500;
     }
     """
     
