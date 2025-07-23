@@ -138,7 +138,7 @@ def create_demo_interface():
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
-        color: #721c24;
+        color: #000000;
         font-weight: 500;
     }
     """
@@ -242,9 +242,9 @@ def create_demo_interface():
                 
                 # Status indicator
                 gr.HTML("""
-                <div style="margin-top: 20px; padding: 10px; background-color: #e8f4f8; border-radius: 5px;">
+                <div style="margin-top: 20px; padding: 15px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <strong>🤖 Powered by:</strong> OpenAI GPT-4, CLIP, and Whisper models<br>
-                    <strong>⚡ Status:</strong> <span style="color: green;">Online and Ready</span>
+                    <strong>⚡ Status:</strong> <span style="color: #28a745; font-weight: bold;">Online and Ready</span>
                 </div>
                 """)
         
