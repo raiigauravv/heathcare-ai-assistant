@@ -1,6 +1,7 @@
 """
 Healthcare AI Assistant - Hugging Face Spaces Demo
 Multimodal healthcare AI with OpenAI integration
+Updated: July 23, 2025 - Improved styling and visibility
 """
 
 import gradio as gr
