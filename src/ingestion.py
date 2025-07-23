@@ -28,12 +28,23 @@ def ingest_image(image_input: Union[str, Image.Image, np.ndarray]) -> Union[Imag
     """
     Handle image input from various sources
     Compatible with Gradio image inputs
+    Supports: JPG, JPEG, PNG, BMP, TIFF, WEBP
     """
     try:
         if isinstance(image_input, str):
             # File path
             if os.path.exists(image_input):
-                return Image.open(image_input).convert('RGB')
+                # Check file extension
+                file_ext = os.path.splitext(image_input)[1].lower()
+                supported_formats = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp']
+                
+                if file_ext not in supported_formats:
+                    logger.error(f"Unsupported image format: {file_ext}. Supported formats: {', '.join(supported_formats)}")
+                    return None
+                
+                # Try to open and convert to RGB
+                img = Image.open(image_input)
+                return img.convert('RGB')
             else:
                 logger.error(f"Image file not found: {image_input}")
                 return None
