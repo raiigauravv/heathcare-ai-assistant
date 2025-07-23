@@ -25,6 +25,7 @@ def multimodal_predict(
     text_symptoms: str,
     medical_image: Optional[str] = None,
     audio_file: Optional[str] = None,
+    patient_name: str = "",
     patient_age: int = 30,
     patient_gender: str = "Not specified"
 ) -> Tuple[str, str, float]:
@@ -35,6 +36,7 @@ def multimodal_predict(
         text_symptoms: Patient's symptom description
         medical_image: Uploaded medical image (optional)
         audio_file: Uploaded audio recording (optional)
+        patient_name: Patient's name for personalization
         patient_age: Patient's age
         patient_gender: Patient's gender
         
@@ -167,6 +169,13 @@ def create_demo_interface():
                     placeholder="Please describe your symptoms in detail (e.g., 'I have been experiencing chest pain and shortness of breath for the past 2 days...')",
                     lines=4,
                     max_lines=8
+                )
+                
+                # Personal information
+                patient_name = gr.Textbox(
+                    label="Name (Optional)",
+                    placeholder="Your first name for personalized interaction",
+                    max_lines=1
                 )
                 
                 with gr.Row():

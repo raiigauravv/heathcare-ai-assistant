@@ -165,6 +165,7 @@ class OpenAIHealthcareAssistant:
                                     symptoms: str, 
                                     image_analysis: str = "", 
                                     audio_analysis: str = "",
+                                    patient_name: str = "",
                                     patient_age: int = 30,
                                     patient_gender: str = "Not specified") -> Dict[str, Any]:
         """
@@ -174,6 +175,7 @@ class OpenAIHealthcareAssistant:
             symptoms: Patient's symptom description
             image_analysis: Results from image analysis
             audio_analysis: Results from audio analysis
+            patient_name: Patient's name for personalization
             patient_age: Patient's age
             patient_gender: Patient's gender
             
@@ -181,12 +183,15 @@ class OpenAIHealthcareAssistant:
             Dictionary containing analysis, recommendations, and confidence
         """
         if self.mock_mode:
-            return self._mock_comprehensive_analysis(symptoms, patient_age, patient_gender)
+            return self._mock_comprehensive_analysis(symptoms, patient_name, patient_age, patient_gender)
         
         try:
-            # Construct the analysis prompt
+            # Construct the analysis prompt with personalization
+            greeting = f"Hello {patient_name.strip()}! " if patient_name.strip() else "Hello! "
+            
             prompt = f"""
             Patient Information:
+            - Name: {patient_name or 'Not provided'}
             - Age: {patient_age}
             - Gender: {patient_gender}
             - Symptoms: {symptoms}
@@ -198,12 +203,15 @@ class OpenAIHealthcareAssistant:
             if audio_analysis:
                 prompt += f"\n- Audio Analysis: {audio_analysis}"
             
+            # Create personalized greeting if name provided
+            greeting = f"Hello {patient_name}, " if patient_name else ""
+            
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {
                         "role": "system",
-                        "content": """You are an AI healthcare assistant providing preliminary analysis based on patient-provided information. 
+                        "content": f"""You are an AI healthcare assistant providing preliminary analysis based on patient-provided information.{f' Address the patient as {patient_name} when appropriate.' if patient_name else ''} 
                         
                         IMPORTANT DISCLAIMERS:
                         - You do not provide medical diagnoses
@@ -220,7 +228,7 @@ class OpenAIHealthcareAssistant:
                     },
                     {
                         "role": "user",
-                        "content": f"""Please analyze this patient case: {prompt}
+                        "content": f"""{greeting}Please analyze this patient case: {prompt}
                         
                         Please provide a comprehensive but responsible analysis following the guidelines above.
                         Format your response as a structured analysis with clear sections."""
