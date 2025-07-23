@@ -1,7 +1,6 @@
 """
 Healthcare AI Assistant - Hugging Face Spaces Demo
 Multimodal healthcare AI with OpenAI integration
-Updated: July 23, 2025 - Improved styling and visibility
 """
 
 import gradio as gr
@@ -26,7 +25,6 @@ def multimodal_predict(
     text_symptoms: str,
     medical_image: Optional[str] = None,
     audio_file: Optional[str] = None,
-    patient_name: str = "",
     patient_age: int = 30,
     patient_gender: str = "Not specified"
 ) -> Tuple[str, str, float]:
@@ -37,7 +35,6 @@ def multimodal_predict(
         text_symptoms: Patient's symptom description
         medical_image: Uploaded medical image (optional)
         audio_file: Uploaded audio recording (optional)
-        patient_name: Patient's name for personalization
         patient_age: Patient's age
         patient_gender: Patient's gender
         
@@ -47,59 +44,41 @@ def multimodal_predict(
     try:
         logger.info("Starting multimodal healthcare prediction")
         
-        # Initialize variables
-        final_symptoms_text = ""
-        audio_analysis = ""
-        image_analysis = ""
-        
-        # Process audio first if provided (to get transcription)
-        if audio_file:
-            try:
-                # Get audio transcription using Whisper
-                audio_analysis = healthcare_ai.analyze_audio_symptoms(audio_file, text_symptoms or "Audio symptoms")
-                
-                # Extract transcription from audio analysis if available
-                if "Transcript:" in audio_analysis:
-                    # Try to extract the transcript text
-                    transcript_part = audio_analysis.split("Transcript:")[1].split("\n")[0].strip()
-                    final_symptoms_text = transcript_part if transcript_part else text_symptoms or ""
-                
-                logger.info("Audio processed successfully")
-            except Exception as e:
-                logger.error(f"Audio processing error: {e}")
-                audio_analysis = "⚠️ Audio analysis unavailable"
-        
-        # Use text symptoms if provided, otherwise use transcription from audio
-        if text_symptoms and len(text_symptoms.strip()) >= 10:
-            final_symptoms_text = text_symptoms
-        elif not final_symptoms_text and audio_file:
-            # Audio-only mode: create a basic prompt
-            final_symptoms_text = "Patient provided audio description of symptoms"
-        
-        # Validate we have some form of symptom description
-        if not final_symptoms_text or (not audio_file and len(final_symptoms_text.strip()) < 10):
-            return "❌ Error: Please provide detailed symptoms in text (at least 10 characters) OR upload an audio recording describing your symptoms", "", 0.0
+        # Validate inputs
+        if not text_symptoms or len(text_symptoms.strip()) < 10:
+            return "❌ Error: Please provide detailed symptoms (at least 10 characters)", "", 0.0
         
         # Process text input
-        processed_text = ingest_text(final_symptoms_text)
+        processed_text = ingest_text(text_symptoms)
         cleaned_text = preprocess_text(processed_text)
         
         # Process image if provided
+        image_analysis = ""
         if medical_image:
             try:
                 img = ingest_image(medical_image)
-                image_analysis = healthcare_ai.analyze_medical_image(img, final_symptoms_text)
+                image_analysis = healthcare_ai.analyze_medical_image(img, text_symptoms)
                 logger.info("Medical image processed successfully")
             except Exception as e:
                 logger.error(f"Image processing error: {e}")
                 image_analysis = "⚠️ Image analysis unavailable"
+        
+        # Process audio if provided
+        audio_analysis = ""
+        if audio_file:
+            try:
+                audio_data = ingest_audio(audio_file)
+                audio_analysis = healthcare_ai.analyze_audio_symptoms(audio_file, text_symptoms)
+                logger.info("Audio processed successfully")
+            except Exception as e:
+                logger.error(f"Audio processing error: {e}")
+                audio_analysis = "⚠️ Audio analysis unavailable"
         
         # Generate comprehensive analysis using OpenAI
         analysis_result = healthcare_ai.comprehensive_health_analysis(
             symptoms=cleaned_text,
             image_analysis=image_analysis,
             audio_analysis=audio_analysis,
-            patient_name=patient_name,
             patient_age=patient_age,
             patient_gender=patient_gender
         )
@@ -172,13 +151,6 @@ def create_demo_interface():
                     placeholder="Please describe your symptoms in detail (e.g., 'I have been experiencing chest pain and shortness of breath for the past 2 days...')",
                     lines=4,
                     max_lines=8
-                )
-                
-                # Personal information
-                patient_name = gr.Textbox(
-                    label="Name (Optional)",
-                    placeholder="Your first name for personalized interaction",
-                    max_lines=1
                 )
                 
                 with gr.Row():
@@ -278,14 +250,14 @@ def create_demo_interface():
         
         gr.Examples(
             examples=examples,
-            inputs=[text_symptoms, medical_image, audio_file, patient_name, patient_age, patient_gender],
+            inputs=[text_symptoms, medical_image, audio_file, patient_age, patient_gender],
             label="Click on an example to try it out"
         )
         
         # Connect the interface
         submit_btn.click(
             fn=multimodal_predict,
-            inputs=[text_symptoms, medical_image, audio_file, patient_name, patient_age, patient_gender],
+            inputs=[text_symptoms, medical_image, audio_file, patient_age, patient_gender],
             outputs=[analysis_output, recommendations_output, confidence_output],
             show_progress=True
         )
