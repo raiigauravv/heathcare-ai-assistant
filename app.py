@@ -98,6 +98,7 @@ def multimodal_predict(
             symptoms=cleaned_text,
             image_analysis=image_analysis,
             audio_analysis=audio_analysis,
+            patient_name=patient_name,
             patient_age=patient_age,
             patient_gender=patient_gender
         )

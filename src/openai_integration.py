@@ -219,18 +219,23 @@ class OpenAIHealthcareAssistant:
                         - Focus on educational information and general health guidance
                         - Be empathetic but maintain professional boundaries
                         
+                        Consider the patient's demographics (age: {patient_age}, gender: {patient_gender}) when relevant to symptoms and conditions.
+                        
                         Provide structured analysis with:
-                        1. Summary of presented symptoms/data
-                        2. Possible conditions to discuss with healthcare providers
-                        3. General health recommendations
-                        4. When to seek immediate medical attention
-                        5. Confidence level (0-1) based on information completeness"""
+                        1. Personalized greeting using the patient's name if provided
+                        2. Summary of presented symptoms/data
+                        3. Possible conditions to discuss with healthcare providers (considering age/gender when relevant)
+                        4. General health recommendations tailored to demographics
+                        5. When to seek immediate medical attention
+                        6. Confidence level (0-1) based on information completeness"""
                     },
                     {
                         "role": "user",
-                        "content": f"""{greeting}Please analyze this patient case: {prompt}
+                        "content": f"""Please analyze this patient case: {prompt}
                         
                         Please provide a comprehensive but responsible analysis following the guidelines above.
+                        Start with a personalized greeting if the patient's name is provided.
+                        Consider the patient's age and gender in your analysis when medically relevant.
                         Format your response as a structured analysis with clear sections."""
                     }
                 ],
