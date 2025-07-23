@@ -4,7 +4,7 @@ Handles all OpenAI API calls for multimodal healthcare analysis
 """
 
 import os
-import openai
+from openai import OpenAI
 import base64
 import logging
 from typing import Dict, Any, Optional
@@ -26,8 +26,9 @@ class OpenAIHealthcareAssistant:
         if not self.api_key:
             logger.warning("OPENAI_API_KEY not found. Using mock responses.")
             self.mock_mode = True
+            self.client = None
         else:
-            openai.api_key = self.api_key
+            self.client = OpenAI(api_key=self.api_key)
             self.mock_mode = False
             logger.info("OpenAI client initialized successfully")
     
@@ -60,7 +61,7 @@ class OpenAIHealthcareAssistant:
             if not base64_image:
                 return "Unable to process image"
             
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-4-vision-preview",
                 messages=[
                     {
@@ -119,10 +120,13 @@ class OpenAIHealthcareAssistant:
         try:
             # Transcribe audio using Whisper
             with open(audio_path, "rb") as audio_file:
-                transcript = openai.Audio.transcribe("whisper-1", audio_file)
+                transcript = self.client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file
+                )
             
             # Analyze the transcript
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {
@@ -194,7 +198,7 @@ class OpenAIHealthcareAssistant:
             if audio_analysis:
                 prompt += f"\n- Audio Analysis: {audio_analysis}"
             
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {
