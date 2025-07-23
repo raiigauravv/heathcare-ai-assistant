@@ -1,0 +1,15 @@
+torch
+transformers
+fastapi
+uvicorn
+opencv-python
+Pillow
+torchaudio
+dvc
+mlflow
+pydantic
+scikit-learn
+kafka-python
+redis
+python-multipart
+pytest
