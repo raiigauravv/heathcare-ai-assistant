@@ -183,9 +183,14 @@ class OpenAIHealthcareAssistant:
             Dictionary containing analysis, recommendations, and confidence
         """
         if self.mock_mode:
-            return self._mock_comprehensive_analysis(symptoms, patient_name, patient_age, patient_gender)
+            return self._mock_comprehensive_analysis(symptoms, patient_age, patient_gender)
         
         try:
+            # Ensure proper type handling
+            patient_name = str(patient_name) if patient_name is not None else ""
+            patient_age = int(patient_age) if patient_age is not None else 30
+            patient_gender = str(patient_gender) if patient_gender is not None else "Not specified"
+            
             # Construct the analysis prompt with personalization
             greeting = f"Hello {patient_name.strip()}! " if patient_name.strip() else "Hello! "
             
